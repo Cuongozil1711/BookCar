@@ -1,16 +1,18 @@
 import * as React from 'react';
-import { Alert, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View, ImageBackground } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import users from '../../model/users';
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { AuthContext } from '../../components/context';
-const LoginScreen = () => {
+import { auth } from '../../config/firebase';
+const LoginScreen = ({navigation}) => {
 
     const [data, setData] = React.useState(
         {
-            username : '',
-            password : '',
-            secureTextEntry : true,
+            username: '',
+            password: '',
+            secureTextEntry: true,
             isValidUser: true,
             isValidPassword: true,
         }
@@ -23,7 +25,7 @@ const LoginScreen = () => {
         })
     }
 
-    const textInputChange = (key,val) => {
+    const textInputChange = (key, val) => {
         setData({
             ...data,
             [key]: val
@@ -31,7 +33,7 @@ const LoginScreen = () => {
     }
 
     const handleValidUser = (val) => {
-        if( val.trim().length >= 4 ) {
+        if (val.trim().length >= 4) {
             setData({
                 ...data,
                 isValidUser: true
@@ -45,7 +47,7 @@ const LoginScreen = () => {
     }
 
     const handlePasswordChange = (val) => {
-        if( val.trim().length >= 8 ) {
+        if (val.trim().length >= 8) {
             setData({
                 ...data,
                 password: val,
@@ -62,41 +64,57 @@ const LoginScreen = () => {
 
     const { signIn } = React.useContext(AuthContext);
 
+    const [dataUser, setDataUser] = React.useState();
 
     const loginHandle = (userName, password) => {
 
-        const foundUser = users.filter( item => {
-            return userName == item.username && password == item.password;
-        } );
+        // const foundUser = users.filter( item => {
+        //     return userName == item.username && password == item.password;
+        // } );
 
-        if ( data.username.length == 0 || data.password.length == 0 ) {
+        if (data.username.length == 0 || data.password.length == 0) {
             Alert.alert('Wrong Input!', 'Username or password field cannot be empty.', [
-                {text: 'Okay'}
+                { text: 'Okay' }
             ]);
             return;
         }
 
-        if (foundUser.length == 0 ) {
-            Alert.alert('Invalid User!', 'Username or password is incorrect.', [
-                {text: 'Okay'}
-            ]);
-            return;
+        if (userName !== "" && password !== "") {
+            signInWithEmailAndPassword(auth, userName, password)
+                .then((r) => setDataUser(r))
+                .catch((err) =>
+                    Alert.alert('Invalid User!', 'Username or password is incorrect.', [
+                        { text: 'Okay' }
+                    ])
+                );
         }
+
+
+        const foundUser = {
+            email: userName,
+            username: userName, 
+            password: password, 
+            userToken: dataUser?.stsTokenManager?.accessToken
+        }
+        
         signIn(foundUser);
     }
 
     return (
         <View style={styles.container}>
-                <StatusBar backgroundColor='#009387' barStyle="light-content"/>
+            <ImageBackground source={require('../../src/assets/hotel1.jpg')} resizeMode="cover" style={styles.image}>
+                <StatusBar translucent backgroundColor="transparent" />
                 <View style={styles.header}>
-                    <Text style={styles.text_header}>Welcome NSMP!</Text>
+                    <Text style={styles.text_header}>Welcome</Text>
+                    <Text style={{ ...styles.text_header, textAlign: 'right' }}>your home</Text>
+                    {/* <Text style={styles.text_header}>w</Text> */}
                 </View>
 
-                <View  animation="fadeInUpBig"
-                style={[styles.footer, {
-                    backgroundColor: '#FFF',
-                }]}>
-                    <Text style={[styles.text_footer, {color: '#333'}]}>Username</Text>
+                <View animation="fadeInUpBig"
+                    style={[styles.footer, {
+                        backgroundColor: '#FFF',
+                    }]}>
+                    <Text style={[styles.text_footer, { color: '#333' }]}>Username</Text>
 
                     <View style={styles.action}>
                         <Icon
@@ -112,18 +130,18 @@ const LoginScreen = () => {
                             }]}
                             editable
                             autoCapitalize="none"
-                            onChangeText={(val) => textInputChange("username",val)}
-                            onEndEditing={(e)=>handleValidUser(e.nativeEvent.text)}
+                            onChangeText={(val) => textInputChange("username", val)}
+                            onEndEditing={(e) => handleValidUser(e.nativeEvent.text)}
                         />
                     </View>
 
-                    { data.isValidUser ? null :
-                    <View animation="fadeInLeft" duration={500}>
-                        <Text style={styles.errorMsg}>Username must be 4 characters long.</Text>
-                    </View>
+                    {data.isValidUser ? null :
+                        <View animation="fadeInLeft" duration={500}>
+                            <Text style={styles.errorMsg}>Username must be 4 characters long.</Text>
+                        </View>
                     }
 
-                    <Text style={[styles.text_footer, {color: '#333',marginTop: 35}]}>Password</Text>
+                    <Text style={[styles.text_footer, { color: '#333', marginTop: 35 }]}>Password</Text>
 
                     <View style={styles.action}>
                         <Icon
@@ -135,52 +153,53 @@ const LoginScreen = () => {
                             placeholder="Your Password"
                             placeholderTextColor="#666666"
                             secureTextEntry={data.secureTextEntry ? true : false}
-                            style={[styles.textInput, {color: '#05375a'}]}
+                            style={[styles.textInput, { color: '#05375a' }]}
                             autoCapitalize="none"
                             onChangeText={(val) => handlePasswordChange(val)}
                         />
 
                         <TouchableOpacity onPress={updateSecureTextEntry}>
                             {data.secureTextEntry ?
-                            <Feather
-                                name="eye-off"
-                                color="grey"
-                                size={20}
-                            />
-                            :
-                            <Feather
-                                name="eye"
-                                color="grey"
-                                size={20}
-                            />
+                                <Feather
+                                    name="eye-off"
+                                    color="grey"
+                                    size={20}
+                                />
+                                :
+                                <Feather
+                                    name="eye"
+                                    color="grey"
+                                    size={20}
+                                />
                             }
                         </TouchableOpacity>
                     </View>
 
-                    { data.isValidPassword ? null : 
+                    {data.isValidPassword ? null :
                         <View animation="fadeInLeft" duration={500}>
-                        <Text style={styles.errorMsg}>Password must be 8 characters long.</Text>
+                            <Text style={styles.errorMsg}>Password must be 8 characters long.</Text>
                         </View>
                     }
 
                     <TouchableOpacity>
-                        <Text style={{color: '#009387', marginTop:15, textAlign: 'right'}}>Forgot password?</Text>
+                        <Text style={{ color: '#009387', marginTop: 15, textAlign: 'right' }}>Forgot password?</Text>
                     </TouchableOpacity>
 
                     <View style={styles.button}>
-                        <TouchableOpacity style={{width: '100%', height: 50, backgroundColor: '#08d4c4', borderRadius: 10, alignItems: 'center', justifyContent: 'center'}} onPress={() => loginHandle(data?.username, data?.password)}>
+                        <TouchableOpacity style={{ width: '100%', height: 50, backgroundColor: '#08d4c4', borderRadius: 10, alignItems: 'center', justifyContent: 'center' }} onPress={() => loginHandle(data?.username, data?.password)}>
                             <Text style={styles.signIn}>Sign In</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={() => {}} style={{marginTop: 15, width: '100%', height: 50,borderColor: '#009387',borderWidth: 1, borderRadius: 10, alignItems: 'center', justifyContent: 'center'}}>
-                            <Text style={[styles.signIn, {color: '#009387'}]}>Sign Up</Text>
+                        <TouchableOpacity onPress={() => { }} style={{ marginTop: 15, width: '100%', height: 50, borderColor: '#009387', borderWidth: 1, borderRadius: 10, alignItems: 'center', justifyContent: 'center' }} onPress={() => navigation.navigate("SignUp")}>
+                            <Text style={[styles.signIn, { color: '#009387' }]}>Sign Up</Text>
                         </TouchableOpacity>
                     </View>
 
-                    <View style={styles.bottom}>
+                    {/* <View style={styles.bottom}>
                         <Text style={styles.text_footer1}>@2022_By_Cuongnv</Text>
-                    </View>
+                    </View> */}
                 </View>
+            </ImageBackground>
         </View>
     )
 };
@@ -189,8 +208,8 @@ export default LoginScreen
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: '#009387'
+        flex: 1,
+        backgroundColor: '#009387'
     },
     header: {
         flex: 1,
@@ -209,7 +228,7 @@ const styles = StyleSheet.create({
     },
 
     footer: {
-        flex: 3,
+        flex: 2.5,
         backgroundColor: '#fff',
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
@@ -268,5 +287,9 @@ const styles = StyleSheet.create({
     textSign: {
         fontSize: 18,
         fontWeight: 'bold'
+    },
+    image: {
+        flex: 1,
+        justifyContent: "center"
     }
-  });
+});
