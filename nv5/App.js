@@ -12,7 +12,7 @@ import RootStackNaviagtion from './screen/unAuthorize/RootStackScreen';
 import Logout from './screen/authorize/Logout';
 import Welcome from './screen/authorize/Welcome';
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "./config/firebase";
+import { auth } from './config/firebase';
 import Chat from './screen/authorize/Chat';
 
 const baseHeaderConfigV2 = (key, options) => ({
@@ -98,6 +98,7 @@ const App = () => {
       const userToken = String(foundUser.userToken);
       const userName = foundUser.username;
       try {
+        signOut(auth).catch(er => console.log(er));
         await AsyncStorage.setItem('userToken', userToken);
       } catch (e) {
         console.log(e);
@@ -148,9 +149,6 @@ const App = () => {
                 }}
               />
               <Stack.Screen name="Chat" component={Chat}
-                options={{
-                  headerShown: true,
-                }}
               />
             </Stack.Navigator>
           )

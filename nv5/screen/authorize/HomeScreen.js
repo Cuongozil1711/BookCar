@@ -65,6 +65,13 @@ export default function HomeScreen({ navigation }) {
         addrees: '118 Street, West Edmonton, Alberta',
         price: '16,00,000',
         phone: '0528129662',
+      },
+      {
+        image: require('../../src/assets/hotel4.jpg'),
+        nameHotel: 'Central Edmon',
+        addrees: '128 Street, Liver , Wetbons',
+        price: '16,00,000',
+        phone: '0589271801',
       }
     ]
 
@@ -105,52 +112,30 @@ export default function HomeScreen({ navigation }) {
     ]
 
 
+
     const [listDatView, setListDatView] = React.useState(dataPopular);
     return (
-      <>
+      <View>
         <View style={styles.itemList}>
           {
             listCategory.map((item, index) =>
             (
-              //<View style={styles.itemList1} key={index}>
               <TouchableOpacity key={index} style={styles.itemList1} onPress={() => itemPressClick(item)}>
                 <Text style={[styles.textItem, isActive === item && { color: 'black', borderBottomWidth: 1, height: 30 }]} key={index}>{item}</Text>
               </TouchableOpacity>
-              // </View>
             ))
           }
         </View>
 
-        {/* {
-          listDatView.map((item, index) => (
-            <View style={styles.detail} key={index}>
-                    <Image
-                    style={styles.stretch}
-                    source={item.image}
-                    />
-                    <View style={{flexDirection: 'row', alignItems: 'center', width:'100%',justifyContent: 'space-between', marginTop: 5}}>
-                      <Text style={{...styles.textItem, color: 'black'}}>{item.nameHotel}</Text>
-                      <Text style={{...styles.textItem, color: 'rgb(70, 130, 180)'}}>${item.price}</Text>
-                    </View>
-                    
-                    <View style={{flexDirection: 'row', alignItems: 'center', width:'100%',justifyContent: 'space-between', marginTop: 5}}>
-                      <Text style={{...styles.textItem, color: '#c3c3c3'}}>{item.addrees}</Text>
-                    </View>
-                    <View style={{flexDirection: 'row', alignItems: 'center', width:'100%',justifyContent: 'space-between', marginTop: 5}}>
-                      <Text style={{...styles.textItem, color: '#c3c3c3'}}>Call: {item.phone}</Text>
-                    </View>
-            </View>
-          ))
-        } */}
-
         <SafeAreaView style={styles.container}>
           <FlatList
             data={listDatView}
+            // ListHeaderComponent={headerItem}
             renderItem={renderItem}
             keyExtractor={(item, index) => item.nameHotel.toString() + index}
           />
         </SafeAreaView>
-      </>
+      </View>
     )
   };
 
@@ -170,31 +155,29 @@ export default function HomeScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </View>
-
-      <SafeAreaView style={{ flex: 1, marginTop: 10 }}>
+       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView}>
           <View style={styles.imageHome}>
-            <View style={styles.imageleft}>
-              <Image
-                style={styles.stretch}
-                source={require('../../src/assets/hotel6.jpg')}
-              />
-              <Text style={styles.textInput1}>Buy a Home</Text>
-            </View>
+              <View style={styles.imageleft}>
+                <Image
+                  style={styles.stretch}
+                  source={require('../../src/assets/hotel6.jpg')}
+                />
+                <Text style={styles.textInput1}>Buy a Home</Text>
+              </View>
 
-            <View style={styles.imageRigth}>
-              <Image
-                style={styles.stretch}
-                source={require('../../src/assets/hotel5.jpg')}
-              />
-              <Text style={styles.textInput1}>Rent a Home</Text>
-            </View>
+              <View style={styles.imageRigth}>
+                <Image
+                  style={styles.stretch}
+                  source={require('../../src/assets/hotel5.jpg')}
+                />
+                <Text style={styles.textInput1}>Rent a Home</Text>
+              </View>
           </View>
 
           <ListProduct />
-
         </ScrollView>
-      </SafeAreaView>
+        </SafeAreaView>
 
       <View style={styles.chat}>
 
@@ -275,14 +258,14 @@ export const styles = StyleSheet.create(
       flexDirection: 'row',
       justifyContent: 'space-between',
       marginTop: 20,
-      width: '100%',
-      height: 220
+      width: width,
+      height: 220,
+      paddingHorizontal: 10
     },
 
     scrollView: {
       // marginHorizontal: 10,
       marginVertical: 10,
-      flexDirection: 'row',
     },
 
     stretch: {
@@ -301,18 +284,19 @@ export const styles = StyleSheet.create(
 
     itemList: {
       flexDirection: 'row',
-      alignItems: 'center'
+      alignItems: 'center',
+      width: width,
     },
 
     itemList1: {
-      flex: 2,
+      flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: 35,
     },
 
     textItem: {
-      fontSize: 18,
+      fontSize: 16,
       color: '#c3c3c3',
     },
 
@@ -324,6 +308,7 @@ export const styles = StyleSheet.create(
       height: 250,
       marginTop: 30,
       borderRadius: 10,
+      width: width,
       paddingHorizontal: 10
     },
 

@@ -81,23 +81,22 @@ const LoginScreen = ({navigation}) => {
 
         if (userName !== "" && password !== "") {
             signInWithEmailAndPassword(auth, userName, password)
-                .then((r) => setDataUser(r))
+                .then((r) => {
+                    const foundUser = {
+                        email: userName,
+                        username: userName, 
+                        password: password, 
+                        userToken: dataUser?.stsTokenManager?.accessToken
+                    }
+                    setDataUser(r);
+                    signIn(foundUser);
+                })
                 .catch((err) =>
                     Alert.alert('Invalid User!', 'Username or password is incorrect.', [
                         { text: 'Okay' }
                     ])
                 );
-        }
-
-
-        const foundUser = {
-            email: userName,
-            username: userName, 
-            password: password, 
-            userToken: dataUser?.stsTokenManager?.accessToken
-        }
-        
-        signIn(foundUser);
+        }        
     }
 
     return (
